@@ -1,1 +1,1 @@
-# MailBuddy
+MailBuddy is an ASP.NET Core Web API that connects to a Gmail account using OAuth2 and the Gmail API. It automatically fetches incoming emails, identifies financial-related messages (like invoices, receipts, or payment confirmations), and categorizes them for easier tracking and management.
