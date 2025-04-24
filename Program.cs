@@ -1,15 +1,27 @@
+using MailBuddy.Models;
+using MailBuddy.Services;
+using Microsoft.Extensions.Options;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddControllers();  // <-- Register controllers
+
+// Register GoogleAuthSettings from appsettings.json
+builder.Services.Configure<GoogleAuthSettings>(
+    builder.Configuration.GetSection("GoogleAuth"));
+builder.Services.AddSingleton<GoogleAuthService>();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
+// Map controllers so routes like /auth/login work
+app.MapControllers();  // <-- Map controller routes
+
+// Optional: You can keep the weather forecast route if needed
+var summaries = new[] {
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
 
