@@ -38,12 +38,19 @@ namespace MailBuddy.Controllers
             return Redirect(googleOAuthUrl);
         }
 
+        //[HttpGet("callback")]
+        //public async Task<IActionResult> Callback([FromQuery] string code)
+        //{
+        //    await _googleAuthService.ExchangeCodeForTokens(code);
+        //    return Ok(new { message = "Callback received!", code });
+        //}
+
         [HttpGet("callback")]
         public async Task<IActionResult> Callback([FromQuery] string code)
         {
-            // TODO: Exchange the code for tokens and fetch Gmail messages
-            await _googleAuthService.ExchangeCodeForTokens(code);
-            return Ok(new { message = "Callback received!", code });
+            var profileJson = await _googleAuthService.ExchangeCodeForTokens(code);
+            return Content(profileJson, "application/json");
         }
+
     }
 }

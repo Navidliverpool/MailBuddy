@@ -1,14 +1,16 @@
 ﻿using MailBuddy.Models;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using System.Net.Http;
-using System.Collections.Generic;
-using System.Net.Http.Headers;
 using Newtonsoft.Json;
+using System.Net.Http.Headers;
+using System.Runtime.Intrinsics.X86;
+using System.Xml.Linq;
 
 namespace MailBuddy.Services
 {
     public class GoogleAuthService
     {
+        // Assigning the settings(such as ClientId, ClientSerect, RedirectUris) to a private field for use throughout this class.
         private readonly GoogleAuthSettings _googleAuthSettings;
 
         public GoogleAuthService(IOptions<GoogleAuthSettings> googleAuthSettings)
@@ -16,7 +18,7 @@ namespace MailBuddy.Services
             _googleAuthSettings = googleAuthSettings.Value;
         }
 
-     public async Task ExchangeCodeForTokens(string code)
+     public async Task<string> ExchangeCodeForTokens(string code)
     {
         var client = new HttpClient();
         var tokenUrl = "https://oauth2.googleapis.com/token";
@@ -32,6 +34,11 @@ namespace MailBuddy.Services
 
         var content = new FormUrlEncodedContent(values);
 
+        //How do you know when to use await?
+        //Use await when:
+        //The method name ends with Async(most of the time).
+        //The method returns a Task or Task<T>.
+        //The operation involves waiting(e.g.web requests, reading files, database access).
         var response = await client.PostAsync(tokenUrl, content);
         var responseString = await response.Content.ReadAsStringAsync();
 
@@ -41,8 +48,12 @@ namespace MailBuddy.Services
         string accessToken = tokenResponse.AccessToken;
         string refreshToken = tokenResponse.RefreshToken;
 
-        // Use the access token to make authorized API calls
-    }
+        // Use the access token to call Gmail API
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+        var gmailResponse = await client.GetAsync("https://www.googleapis.com/gmail/v1/users/me/profile");
+        return await gmailResponse.Content.ReadAsStringAsync();
+        }
 }
     public class TokenResponse
     {
